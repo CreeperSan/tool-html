@@ -1,0 +1,59 @@
+{% extends "views/base/base_html.nunjucks" %}
+
+{% block head_title %} CreeperSan的工具箱 {% endblock %}
+
+{% block head_keyword %}CreeperSan,在线工具,工具,在线,实用工具{% endblock %}
+
+{% block head_description %}👀{% endblock %}
+
+{% block head %}
+    <link rel="shortcut icon" href="/res/index/favicon_index.ico">
+    <link rel="stylesheet" href="/index/css/index.css"/>
+    <script src="/index/js/index.js"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="root-div">
+        <div class="header-div">
+            <h1 class="header-title">在线工具</h1>
+            <span class="header-description">👀</span>
+        </div>
+
+        {% for content in data.content %}
+
+            <span class="index-title">{{ content.category_name }}</span>
+
+            {% for item in content.items %}
+
+                <a class="index-item-div" href="{{ item.url }}" title="{{ item.description }}">
+                    <div class="index-item-div-filter" style="background: url('{{ item.background_url }}') center center;">
+                        <span class="index-item-div-title">{{ item.title }}</span>
+                    </div>
+                </a>
+
+            {% endfor %}
+
+        {% endfor %}
+
+        <nav class="index-nav">
+            <span class="index-nav-text">Copyright © 2019 CreeperSan</span>
+            <span class="index-nav-text">🐹</span>
+            <span class="index-nav-content-title">看看其他</span>
+            <div class="index-nav-content-div">
+                <div class="index-nav-item-div">
+                    <a class="index-nav-item-selection" href="http://bing.creepersan.com">必应壁纸</a>
+                    <a class="index-nav-item-selection" href="http://blog.creepersan.com">CreeperSan的记事本</a>
+                    <a class="index-nav-item-selection" href="http://graffiti.creepersan.com/">CreeperSan的涂鸦</a>
+                </div>
+                <div class="index-nav-item-div">
+                    <a class="index-nav-item-selection" href="#">关于</a>
+                    <a class="index-nav-item-selection" href="mailto:me@creepersan.com">联系我</a>
+                </div>
+            </div>
+        </nav>
+
+    </div>
+    <script>
+
+    </script>
+{% endblock %}

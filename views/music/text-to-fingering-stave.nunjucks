@@ -1,0 +1,191 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge,chrome=1">
+    <link rel="shortcut icon" href="/res/display/hex_clock/favicon_hex_clock.ico">
+    <title>四线谱指法生成器</title>
+    <style>
+        html,body,div{
+            width: 100%;height: 100%;margin: 0;padding: 0;display: flex;
+        }
+    </style>
+</head>
+
+<body style="flex-direction: column;align-items: center;">
+<label style="padding-top: 36px;">
+    <span>请输入内容</span>
+    <textarea style="width: 100%;margin-top: 16px;"></textarea>
+</label>
+<canvas id="element_canvas" width="800" height="100" style="margin-top: 26px;border: red solid 1px;">
+    <span>您的浏览器不支持canvas，请更换Google Chrome浏览器进行访问</span>
+</canvas>
+<script>
+    const canvas = document.getElementById('element_canvas')
+    const paint = canvas.getContext('2d')
+
+    const FINGERING_WIDTH = 5
+    const FINGERING_HEIGHT = 4
+    const FINGERING_WIDTH_UNIT = 10
+    const FINGERING_HEIGHT_UNIT = 15
+    const FINGERING_HEAD_STROKE_WEIGHT = 1
+    const FINGERING_STROKE_WEIGHT = 1
+    const FINGERING_DOT_RADIUS = 3
+
+    function draw_line(x1, y1, x2, y2, weight){
+        paint.lineWidth = weight
+        paint.moveTo(x1, y1)
+        paint.lineTo(x2, y2)
+        paint.stroke()
+    }
+
+    function draw_dot(x, y, radius) {
+        paint.strokeWidth = 0
+        paint.lineWidth = 0
+        paint.beginPath()
+        paint.moveTo(x, y)
+        paint.arc(x, y, radius, 0, Math.PI * 2, true)
+        paint.closePath()
+        paint.fill()
+    }
+
+    function draw_fingering(x, y, horizontal_size, vertical_size, dots) {
+        // 绘制竖线
+        for (let i=0; i<=horizontal_size; i++){
+            let line_weight = FINGERING_STROKE_WEIGHT
+            if(i <= 0){
+                line_weight = FINGERING_HEAD_STROKE_WEIGHT
+            }
+            draw_line(
+                x + i * FINGERING_WIDTH_UNIT,
+                y,
+                x + i * FINGERING_WIDTH_UNIT,
+                y + (vertical_size - 1) * FINGERING_HEIGHT_UNIT,
+                line_weight
+            )
+        }
+        // 绘制横线
+        for (let i=0; i<vertical_size; i++){
+            draw_line(
+                x,
+                y + i * FINGERING_HEIGHT_UNIT,
+                x + horizontal_size * FINGERING_WIDTH_UNIT,
+                y + i * FINGERING_HEIGHT_UNIT,
+                FINGERING_STROKE_WEIGHT
+            )
+        }
+        // 绘制点
+        for(let index in dots){
+            const tmp_dot = dots[index]
+            draw_dot(
+                x + ( tmp_dot[0] + 0.5 ) * FINGERING_WIDTH_UNIT,
+                y + tmp_dot[1] * FINGERING_HEIGHT_UNIT,
+                FINGERING_DOT_RADIUS
+            )
+        }
+    }
+
+    function draw_fingering_c(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], ])
+    }
+    function draw_fingering_cm(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], ])
+    }
+    function draw_fingering_c7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], ])
+    }
+    function draw_fingering_cm7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], [2, 3], ])
+    }
+
+    function draw_fingering_g(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [2, 1], [1, 2], ])
+    }
+    function draw_fingering_gm(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], [2, 1], [1, 2], ])
+    }
+    function draw_fingering_g7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [0, 1], [1, 2], ])
+    }
+    function draw_fingering_gm7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], [0, 1], [1, 2], ])
+    }
+
+    function draw_fingering_d(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 1], [1, 2], [1, 3], ])
+    }
+    function draw_fingering_dm(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 1], [1, 2], [1, 3], ])
+    }
+    function draw_fingering_d7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [1, 1], [1, 2], [1, 3], ])
+    }
+    function draw_fingering_dm7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [1, 2], [1, 3], ])
+    }
+
+    function draw_fingering_a(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 1], [1, 2], [1, 3], ])
+    }
+    function draw_fingering_am(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], ])
+    }
+    function draw_fingering_a7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], ])
+    }
+    function draw_fingering_am7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], [2, 3], ])
+    }
+
+    function draw_fingering_e(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 1], [1, 2], [1, 3], ])
+    }
+    function draw_fingering_em(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], ])
+    }
+    function draw_fingering_e7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], ])
+    }
+    function draw_fingering_em7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], [2, 3], ])
+    }
+
+    function draw_fingering_b(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 1], [1, 2], [1, 3], ])
+    }
+    function draw_fingering_bm(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], ])
+    }
+    function draw_fingering_b7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], ])
+    }
+    function draw_fingering_bm7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], [2, 3], ])
+    }
+
+    function draw_fingering_f(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 1], [1, 2], [1, 3], ])
+    }
+    function draw_fingering_fm(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], ])
+    }
+    function draw_fingering_f7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], ])
+    }
+    function draw_fingering_fm7(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], [2, 3], ])
+    }
+
+
+    draw_fingering_d(16, 16)
+    draw_fingering_dm(106, 16)
+    draw_fingering_d7(206, 16)
+    draw_fingering_dm7(306, 16)
+
+</script>
+</body>
+
+</html>
+
