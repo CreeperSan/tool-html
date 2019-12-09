@@ -17,10 +17,10 @@
 <body style="flex-direction: column;align-items: center;">
 <label style="padding-top: 36px;">
     <span>请输入内容</span>
-    <textarea style="width: 100%;margin-top: 16px;"></textarea>
+    <textarea id="content-textarea" style="width: 100%;margin-top: 16px;">/c/d d+ d~ d/fm7 - b(123,12,-,3)/</textarea>
 </label>
 <button onclick="generate()" style="width: 160px;height: 32px;margin-top: 16px;">生成</button>
-<canvas id="element_canvas" width="800" height="100" style="margin-top: 26px;border: red solid 1px;">
+<canvas id="element_canvas" width="900" height="800" style="margin-top: 26px;border: red solid 1px;">
     <span>您的浏览器不支持canvas，请更换Google Chrome浏览器进行访问</span>
 </canvas>
 <script>
@@ -41,11 +41,13 @@
     // 规范
     // / 代表分隔一节
     // 空格 分隔
-    // - 代表空
+    // ~ 代表空
     // 一个调后面紧接着()代表指弹,例如c(123,1,4,14),C调,弹123弦,1弦,4弦,14弦这样子
     // + 代表扫弦↑, -  代表扫弦↓
 
     function draw_line(x1, y1, x2, y2, weight){
+        paint.fillStyle = 'rgba(0,0,0,0)'
+        paint.strokeStyle = 'black'
         paint.lineWidth = weight
         paint.moveTo(x1, y1)
         paint.lineTo(x2, y2)
@@ -53,8 +55,8 @@
     }
 
     function draw_dot(x, y, radius) {
-        paint.strokeWidth = 0
-        paint.lineWidth = 0
+        paint.fillStyle = 'black'
+        paint.strokeStyle = 'rgba(0,0,0,0)'
         paint.beginPath()
         paint.moveTo(x, y)
         paint.arc(x, y, radius, 0, Math.PI * 2, true)
@@ -62,7 +64,13 @@
         paint.fill()
     }
 
-    function draw_fingering(x, y, horizontal_size, vertical_size, dots) {
+    function draw_fingering(x, y, horizontal_size, vertical_size, dots, hint) {
+        // 绘制文字
+        paint.fillStyle = 'black'
+        if (hint !== undefined){
+            paint.font = '28px Arial'
+            paint.fillText(hint.toString(), x, y - 12)
+        }
         // 绘制竖线
         for (let i=0; i<=horizontal_size; i++){
             let line_weight = FINGERING_STROKE_WEIGHT
@@ -99,104 +107,191 @@
     }
 
     function draw_fingering_c(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], ], 'c')
     }
     function draw_fingering_cm(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], ], 'cm')
     }
     function draw_fingering_c7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], ], 'c7')
     }
     function draw_fingering_cm7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], [2, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [2, 1], [2, 2], [2, 3], ], 'cm7')
     }
 
     function draw_fingering_g(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [2, 1], [1, 2], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [2, 1], [1, 2], ], 'g')
     }
     function draw_fingering_gm(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], [2, 1], [1, 2], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], [2, 1], [1, 2], ], 'gm')
     }
     function draw_fingering_g7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [0, 1], [1, 2], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [0, 1], [1, 2], ], 'g7')
     }
     function draw_fingering_gm7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], [0, 1], [1, 2], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 0], [0, 1], [1, 2], ], 'gm7')
     }
 
     function draw_fingering_d(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 1], [1, 2], [1, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 1], [1, 2], [1, 3], ], 'd')
     }
     function draw_fingering_dm(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 1], [1, 2], [1, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 1], [1, 2], [1, 3], ], 'dm')
     }
     function draw_fingering_d7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [1, 1], [1, 2], [1, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [1, 1], [1, 2], [1, 3], ], 'd7')
     }
     function draw_fingering_dm7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [1, 2], [1, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [1, 2], [1, 3], ], 'dm7')
     }
 
     function draw_fingering_a(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 2], [1, 3],  ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 2], [1, 3],  ], 'a')
     }
     function draw_fingering_am(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 3], ], 'am')
     }
     function draw_fingering_a7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 2], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 2], ], 'a7')
     }
     function draw_fingering_am7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [  ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [  ], 'am7')
     }
 
     function draw_fingering_e(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [3, 1], [3, 2], [3, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [3, 1], [3, 2], [3, 3], ], 'e')
     }
     function draw_fingering_em(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [2, 1], [3, 2], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [2, 1], [3, 2], ], 'em')
     }
     function draw_fingering_e7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 2], [0, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 2], [0, 3], ], 'e7')
     }
     function draw_fingering_em7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 2],  ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 2],  ], 'em7')
     }
 
     function draw_fingering_b(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 1], [2, 2], [3, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 1], [2, 2], [3, 3], ], 'b')
     }
     function draw_fingering_bm(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 1], [1, 2], [3, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 1], [1, 2], [3, 3], ], 'bm')
     }
     function draw_fingering_b7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 1], [2, 2], [3, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 1], [2, 2], [3, 3], ], 'b7')
     }
     function draw_fingering_bm7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 1], [1, 2], [1, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [1, 0], [1, 1], [1, 2], [1, 3], ], 'bm7')
     }
 
     function draw_fingering_f(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 1], [1, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [0, 1], [1, 3], ], 'f')
     }
     function draw_fingering_fm(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [0, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [0, 3], ], 'fm')
     }
     function draw_fingering_f7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [2, 2], [1, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [2, 2], [1, 3], ], 'f7')
     }
     function draw_fingering_fm7(x, y){
-        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [2, 2], [0, 3], ])
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [2, 2], [0, 3], ], 'fm7')
+    }
+
+    const BLOCK_WIDTH = canvas.width * 0.8
+
+    function draw_block(x, y, block_content) {
+
     }
 
     function generate(){
+        let content = document.getElementById('content-textarea').value.toString()
+
+        let content_array = []
+        let content_split_array = content.split('/')
+        for(let i=0; i<content_split_array.length; i++){
+            let tmp_content_item = content_split_array[i].trim()
+            if(tmp_content_item.length > 0){
+                content_array.push(tmp_content_item)
+            }
+        }
+
+        log(content_array)
 
     }
 
-    draw_fingering_f(16, 16)
-    draw_fingering_fm(106, 16)
-    draw_fingering_f7(206, 16)
-    draw_fingering_fm7(306, 16)
+    function log(msg){
+        console.log(msg)
+    }
+
+    paint.fillStyle = 'white'
+    paint.strokeStyle = 'rgba(0,0,0,0)'
+    paint.fillRect(0, 0, canvas.width, canvas.height)
+
+    let v = 36
+    let c = 400
+
+    let v_distance = 150
+    let c_distance = 500
+
+    c = 0
+    draw_fingering_c(16 + c, v)
+    draw_fingering_cm(106 + c, v)
+    draw_fingering_c7(206 + c, v)
+    draw_fingering_cm7(306 + c, v)
+
+    c = c_distance
+    draw_fingering_g(16 + c, v)
+    draw_fingering_gm(106 + c, v)
+    draw_fingering_g7(206 + c, v)
+    draw_fingering_gm7(306 + c, v)
+
+    v += v_distance
+
+
+    //////////////////////////////////////////
+
+    c = 0
+    draw_fingering_d(16 + c, v)
+    draw_fingering_dm(106 + c, v)
+    draw_fingering_d7(206 + c, v)
+    draw_fingering_dm7(306 + c, v)
+
+    c = c_distance
+    draw_fingering_a(16 + c, v)
+    draw_fingering_am(106 + c, v)
+    draw_fingering_a7(206 + c, v)
+    draw_fingering_am7(306 + c, v)
+
+    v += v_distance
+
+    //////////////////////////////////////////
+
+    c = 0
+    draw_fingering_e(16 + c, v)
+    draw_fingering_em(106 + c, v)
+    draw_fingering_e7(206 + c, v)
+    draw_fingering_em7(306 + c, v)
+
+    c = c_distance
+    draw_fingering_b(16 + c, v)
+    draw_fingering_bm(106 + c, v)
+    draw_fingering_b7(206 + c, v)
+    draw_fingering_bm7(306 + c, v)
+
+    v += v_distance
+
+    //////////////////////////////////////////
+
+    c = 0
+    draw_fingering_f(16 + c, v)
+    draw_fingering_fm(106 + c, v)
+    draw_fingering_f7(206 + c, v)
+    draw_fingering_fm7(306 + c, v)
+
+
+
+
+    draw_block(16, 16, 'c')
 
 </script>
 </body>
