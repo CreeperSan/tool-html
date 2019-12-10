@@ -15,12 +15,12 @@
 </head>
 
 <body style="flex-direction: column;align-items: center;">
-<label style="padding-top: 36px;">
+<label style="padding-top: 36px;display: flex;flex-direction: column;align-items: center;">
     <span>请输入内容</span>
-    <textarea id="content-textarea" style="width: 100%;margin-top: 16px;">/c/d d+ d~ d/fm7 - b(123,12,-,3)/</textarea>
+    <textarea id="content-textarea" style="width: 600px;height:280px;margin-top: 16px;">/ c c c c / f f f f / g7 g7 g7 g7 / f f f ~ /</textarea>
 </label>
 <button onclick="generate()" style="width: 160px;height: 32px;margin-top: 16px;">生成</button>
-<canvas id="element_canvas" width="900" height="800" style="margin-top: 26px;border: red solid 1px;">
+<canvas id="element_canvas" width="1280" height="1920" style="margin-top: 26px;border: red solid 1px;">
     <span>您的浏览器不支持canvas，请更换Google Chrome浏览器进行访问</span>
 </canvas>
 <script>
@@ -34,16 +34,27 @@
     const FINGERING_HEAD_STROKE_WEIGHT = 1
     const FINGERING_STROKE_WEIGHT = 1
     const FINGERING_DOT_RADIUS = 3
+    const FINGERING_TEXT_SIZE = 28
+    const FINGERING_TEXT_DISTANCE = 8
+
+    const LINE_WIDTH = canvas.width *0.8
+    const LINE_HEIGHT = 75
+    const LINE_HORIZONTAL_ITEM_COUNT = 3
+    const LINE_VERTICAL_LINE_COUNT = 4
+
+    const LINE_DISTANCE = 56
 
     let step = 4
     let str = ''
 
     // 规范
-    // / 代表分隔一节
-    // 空格 分隔
-    // ~ 代表空
-    // 一个调后面紧接着()代表指弹,例如c(123,1,4,14),C调,弹123弦,1弦,4弦,14弦这样子
-    // + 代表扫弦↑, -  代表扫弦↓
+    // / 代表分隔一拍
+    // 空格 分隔每一拍内的动作，动作有以下3种
+    //      1. ~ 代表空
+    //      2. 数字代表要弹的弦，如1代表 1弦， 23代表2和3弦
+    //      3. + 代表扫弦↑, -  代表扫弦↓
+    //      PS : 关于动作，如果小括号括着并且用逗号分隔则代表逗号左右为1/8拍，
+    //      PPS: 如有冒号，后面则代表的是歌词（歌词不能包含上面的特殊字符）
 
     function draw_line(x1, y1, x2, y2, weight){
         paint.fillStyle = 'rgba(0,0,0,0)'
@@ -68,8 +79,8 @@
         // 绘制文字
         paint.fillStyle = 'black'
         if (hint !== undefined){
-            paint.font = '28px Arial'
-            paint.fillText(hint.toString(), x, y - 12)
+            paint.font = FINGERING_TEXT_SIZE.toString() + 'px Arial'
+            paint.fillText(hint.toString().toUpperCase(), x, y - FINGERING_TEXT_DISTANCE)
         }
         // 绘制竖线
         for (let i=0; i<=horizontal_size; i++){
@@ -197,15 +208,20 @@
         draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [ [2, 0], [0, 1], [2, 2], [0, 3], ], 'fm7')
     }
 
-    const BLOCK_WIDTH = canvas.width * 0.8
-
-    function draw_block(x, y, block_content) {
-
+    function draw_fingering_empty(x, y){
+        draw_fingering( x, y, FINGERING_WIDTH, FINGERING_HEIGHT, [  ], '~')
     }
 
     function generate(){
+        // 清屏
+        paint.fillStyle = 'white'
+        paint.fillRect(0, 0, canvas.width, canvas.height)
+        // 初始化临时变量
+        // 绘制
         let content = document.getElementById('content-textarea').value.toString()
-
+        let x = 32
+        let y = 32
+        // 分割每一拍
         let content_array = []
         let content_split_array = content.split('/')
         for(let i=0; i<content_split_array.length; i++){
@@ -214,84 +230,101 @@
                 content_array.push(tmp_content_item)
             }
         }
+        // 绘制每一拍
+        for (let i=0; i<content_array.length; i++){
+            let content_item = content_array[i]
+            let tmp_chord_array = content_item.split(" ")
+            // 去除无用的信息
+            let chord_array = []
+            for(let j=0; j<tmp_chord_array.length; j++){
+                let tmp = tmp_chord_array[j].trim()
+                if(tmp.length > 0){
+                    chord_array.push(tmp)
+                }
+            }
+            // 补全不足 4 的部分
+            if (chord_array.length < 4){
+                for (let j=chord_array.length; j<4; j++){
+                    chord_array.push('~')
+                }
+            }
+
+            log(chord_array)
+            // 绘制
+            for(let j=0; j<chord_array.length; j++){
+                let chord = chord_array[j].trim()
+                // 绘制指法
+                switch(chord.toUpperCase()){
+                    case 'A' : draw_fingering_a(x, y);break
+                    case 'B' : draw_fingering_b(x, y);break
+                    case 'C' : draw_fingering_c(x, y);break
+                    case 'D' : draw_fingering_d(x, y);break
+                    case 'E' : draw_fingering_e(x, y);break
+                    case 'F' : draw_fingering_f(x, y);break
+                    case 'G' : draw_fingering_g(x, y);break
+
+                    case 'AM' : draw_fingering_am(x, y);break
+                    case 'BM' : draw_fingering_bm(x, y);break
+                    case 'CM' : draw_fingering_cm(x, y);break
+                    case 'DM' : draw_fingering_dm(x, y);break
+                    case 'EM' : draw_fingering_em(x, y);break
+                    case 'FM' : draw_fingering_fm(x, y);break
+                    case 'GM' : draw_fingering_gm(x, y);break
+
+                    case 'A7' : draw_fingering_a7(x, y);break
+                    case 'B7' : draw_fingering_b7(x, y);break
+                    case 'C7' : draw_fingering_c7(x, y);break
+                    case 'D7' : draw_fingering_d7(x, y);break
+                    case 'E7' : draw_fingering_e7(x, y);break
+                    case 'F7' : draw_fingering_f7(x, y);break
+                    case 'G7' : draw_fingering_g7(x, y);break
+
+                    case 'AM7' : draw_fingering_am7(x, y);break
+                    case 'BM7' : draw_fingering_bm7(x, y);break
+                    case 'CM7' : draw_fingering_cm7(x, y);break
+                    case 'DM7' : draw_fingering_dm7(x, y);break
+                    case 'EM7' : draw_fingering_em7(x, y);break
+                    case 'FM7' : draw_fingering_fm7(x, y);break
+                    case 'GM7' : draw_fingering_gm7(x, y);break
+
+                    case '~' : draw_fingering_empty(x, y);break
+                }
+                // 绘制指弹谱
+                {
+                    for(let a=0; a<LINE_VERTICAL_LINE_COUNT; a++){
+                        let tmp_y = y + ( (FINGERING_HEIGHT - 1) * FINGERING_HEIGHT_UNIT + FINGERING_TEXT_SIZE + FINGERING_TEXT_DISTANCE)
+                        tmp_y = tmp_y + a * (LINE_HEIGHT / (LINE_VERTICAL_LINE_COUNT - 1))
+                        draw_line(x, tmp_y, x + LINE_WIDTH / LINE_HORIZONTAL_ITEM_COUNT, tmp_y)
+                    }
+                    let tmp_y = y + ( (FINGERING_HEIGHT - 1) * FINGERING_HEIGHT_UNIT + FINGERING_TEXT_SIZE + FINGERING_TEXT_DISTANCE)
+                    draw_line(x, tmp_y, x, tmp_y + LINE_HEIGHT)
+                    let tmp_x = x + LINE_WIDTH / LINE_HORIZONTAL_ITEM_COUNT
+                    draw_line(tmp_x, tmp_y, tmp_x, tmp_y + LINE_HEIGHT)
+                }
+                // 下一个的位置计算
+                x += LINE_WIDTH / LINE_HORIZONTAL_ITEM_COUNT
+                if (x > 1280){
+                    x %= 100
+                    // y 加上指法示意图的高度
+                    y += ( (FINGERING_HEIGHT - 1) * FINGERING_HEIGHT_UNIT + FINGERING_TEXT_SIZE + FINGERING_TEXT_DISTANCE)
+                    // y 加上指弹示意图的高度
+                    y += LINE_HEIGHT
+                    // y 加上行距
+                    y += LINE_DISTANCE
+                }
+            }
+        }
 
         log(content_array)
 
     }
 
+    generate()
+
     function log(msg){
         console.log(msg)
     }
 
-    paint.fillStyle = 'white'
-    paint.strokeStyle = 'rgba(0,0,0,0)'
-    paint.fillRect(0, 0, canvas.width, canvas.height)
-
-    let v = 36
-    let c = 400
-
-    let v_distance = 150
-    let c_distance = 500
-
-    c = 0
-    draw_fingering_c(16 + c, v)
-    draw_fingering_cm(106 + c, v)
-    draw_fingering_c7(206 + c, v)
-    draw_fingering_cm7(306 + c, v)
-
-    c = c_distance
-    draw_fingering_g(16 + c, v)
-    draw_fingering_gm(106 + c, v)
-    draw_fingering_g7(206 + c, v)
-    draw_fingering_gm7(306 + c, v)
-
-    v += v_distance
-
-
-    //////////////////////////////////////////
-
-    c = 0
-    draw_fingering_d(16 + c, v)
-    draw_fingering_dm(106 + c, v)
-    draw_fingering_d7(206 + c, v)
-    draw_fingering_dm7(306 + c, v)
-
-    c = c_distance
-    draw_fingering_a(16 + c, v)
-    draw_fingering_am(106 + c, v)
-    draw_fingering_a7(206 + c, v)
-    draw_fingering_am7(306 + c, v)
-
-    v += v_distance
-
-    //////////////////////////////////////////
-
-    c = 0
-    draw_fingering_e(16 + c, v)
-    draw_fingering_em(106 + c, v)
-    draw_fingering_e7(206 + c, v)
-    draw_fingering_em7(306 + c, v)
-
-    c = c_distance
-    draw_fingering_b(16 + c, v)
-    draw_fingering_bm(106 + c, v)
-    draw_fingering_b7(206 + c, v)
-    draw_fingering_bm7(306 + c, v)
-
-    v += v_distance
-
-    //////////////////////////////////////////
-
-    c = 0
-    draw_fingering_f(16 + c, v)
-    draw_fingering_fm(106 + c, v)
-    draw_fingering_f7(206 + c, v)
-    draw_fingering_fm7(306 + c, v)
-
-
-
-
-    draw_block(16, 16, 'c')
 
 </script>
 </body>
